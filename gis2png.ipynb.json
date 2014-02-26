@@ -1,0 +1,135 @@
+{
+ "metadata": {
+  "name": "Untitled0"
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "#Converting GIS floating point data to PNG\n\nUSGS makes GIS data available in floating point format in \".flt\" files. An example can be [found here](http://gisdata.usgs.gov/TDDS/DownloadFile.php?TYPE=ned3f_zip&FNAME=n38w123.zip&ORIG=TNM&dlpre=1-1).\n\nThere are two files in the download.. one is the 467.6MB `floatn38w123_13.flt`. There is an associated header file called `floatn38w123_13.hdr`.\n\nIf you look in the .hdr file, you will see the size of the image:\n```\nncols         10812\nnrows         10812\n```\n\nSo, our image is 10812 pixels X 10812 pixels. A float is 4 bytes. Let's do a sanity check:\n```\n>>> 10812*10812*4\n467597376\n```\n\nThis is the number of bytes of the .flt file, so we are in good shape. Let's use python to convert the `flt` file to an image.\n\nYou will need two python packages, PIL and numpy.\n\nI use pip to install these\u2026\n```\n$ pip install PIL\n$ pip install numpy\n```\n\nOK, here we go!"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "import numpy\nf32le = numpy.dtype('<f4')  #32-bit Little Endian floating point datatype\narray = numpy.fromfile('floatn38w123_13.flt', count=10812*10812, dtype=f32le)",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 1
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "#We now have all our data in a 1-dimensional array called `array`.\nprint 'max, min = ', array.max(), array.min()       ",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "max, min =  "
+      },
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "986.296 "
+      },
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "-9999.0\n"
+      }
+     ],
+     "prompt_number": 6
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "OK, this -9999 min value is the `NODATA_value` defined in the `.hdr` file. Let's replace tbe NODATA pixels with 0 for now:"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "array[array == -9999] = 0\narray.min()",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "metadata": {},
+       "output_type": "pyout",
+       "prompt_number": 10,
+       "text": "-66.78437"
+      }
+     ],
+     "prompt_number": 10
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Let's make it a 2d array"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "shape = (10812, 10812)\narray2d = array.reshape(shape)",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 13
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "OK, now we need to convert this floating point array into 0-255 (unsigned 8-bit int) range."
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "range = array2d.max()-array2d.min()\narray2d_scaled = (255.0 / range * (array2d - array2d.min()))\nprint 'array max, min = ', array2d_scaled.max(), array2d_scaled.min()",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "array max, min =  255.0 "
+      },
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "0.0\n"
+      }
+     ],
+     "prompt_number": 18
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Now, convert from float32 to uint8 and write to png:"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "array2d_scaled_uint8 = array2d_scaled.astype(numpy.uint8)\n\nimport Image\nim = Image.fromarray(array2d_scaled_uint8)\nim.save('rescaled.png')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 23
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}
