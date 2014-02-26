@@ -10,7 +10,7 @@
     {
      "cell_type": "markdown",
      "metadata": {},
-     "source": "#Converting GIS floating point data to PNG\n\nUSGS makes GIS data available in floating point format in \".flt\" files. An example can be [found here](http://gisdata.usgs.gov/TDDS/DownloadFile.php?TYPE=ned3f_zip&FNAME=n38w123.zip&ORIG=TNM&dlpre=1-1).\n\nThere are two files in the download.. one is the 467.6MB `floatn38w123_13.flt`. There is an associated header file called `floatn38w123_13.hdr`.\n\nIf you look in the .hdr file, you will see the size of the image:\n```\nncols         10812\nnrows         10812\n```\n\nSo, our image is 10812 pixels X 10812 pixels. A float is 4 bytes. Let's do a sanity check:\n```\n>>> 10812*10812*4\n467597376\n```\n\nThis is the number of bytes of the .flt file, so we are in good shape. Let's use python to convert the `flt` file to an image.\n\nYou will need two python packages, PIL and numpy.\n\nI use pip to install these\u2026\n```\n$ pip install PIL\n$ pip install numpy\n```\n\nOK, here we go!"
+     "source": "#Converting GIS floating point data to PNG\n\nUSGS makes GIS data available in floating point format in \".flt\" files. An example can be [found here](http://gisdata.usgs.gov/TDDS/DownloadFile.php?TYPE=ned3f_zip&FNAME=n38w123.zip&ORIG=TNM&dlpre=1-1).\n\nThere are two files in the download.. One is the 467.6MB `floatn38w123_13.flt`. There is an associated header file called `floatn38w123_13.hdr`.\n\nIf you look in the .hdr file, you will see the size of the image:\n```\nncols         10812\nnrows         10812\n```\n\nSo, our image is 10812 pixels X 10812 pixels. A float is 4 bytes. Let's do a sanity check:\n```\n>>> 10812*10812*4\n467597376\n```\n\nThis is the number of bytes of the .flt file, so we are in good shape. Let's use python to convert the `flt` file to an image.\n\nYou will need two python packages, PIL and numpy.\n\nI use pip to install these\u2026\n```\n$ pip install PIL\n$ pip install numpy\n```\n\nOK, here we go!"
     },
     {
      "cell_type": "code",
@@ -121,12 +121,9 @@
      "prompt_number": 23
     },
     {
-     "cell_type": "code",
-     "collapsed": false,
-     "input": "",
-     "language": "python",
+     "cell_type": "markdown",
      "metadata": {},
-     "outputs": []
+     "source": "Here is the PNG:\n\n<img src=\"http://i.imgur.com/de3wka2.jpg\">"
     }
    ],
    "metadata": {}
